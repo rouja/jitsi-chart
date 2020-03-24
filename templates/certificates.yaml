@@ -1,0 +1,14 @@
+{{- if .Values.certificate.enabled -}}
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: jitsi-certificate
+spec:
+  commonName: {{ .Values.certificate.maindomain }}
+  dnsNames:
+    {{- toYaml .Values.certificate.altnames | nindent 4 }}
+  issuerRef:
+    kind: ClusterIssuer
+    name: {{ .Values.certificate.issuer }}
+  secretName: jitsi-certificates
+{{- end }}

@@ -1,0 +1,200 @@
+# Default values for jitsi-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  # publicIp: ""
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: jitsi.meet.jitsi
+      paths:
+        - "/"
+    - host: guest.jitsi.meet.jitsi
+      paths:
+        - "/"
+  tls: 
+    - hosts:
+      - jitsi.meet.jitsi
+      secretName: jitsi-certificates
+    - hosts:
+      - guest.jitsi.meet.jitsi
+      secretName: jitsi-certificates
+
+certificate:
+  enabled: false
+  maindomain: jitsi.meet.jitsi
+  altnames:
+    - jitsi.meet.jitsi 
+    - guest.jitsi.meet.jitsi
+  issuer: letsencrypt-stage
+
+configmap: |
+  # JICOFO_AUTH_PASSWORD: 
+  # JICOFO_COMPONENT_SECRET: 
+  # JVB_AUTH_PASSWORD: 
+
+jicofo:
+  env:
+    - name: ENABLE_AUTH
+      value: "0"
+    - name: ENABLE_GUESTS
+      value: "0"
+    - name: AUTH_TYPE
+      value: internal
+    - name: XMPP_GUEST_DOMAIN
+      value: guest.jitsi.meet.jitsi
+    - name: XMPP_SERVER
+      value: localhost
+    - name: XMPP_DOMAIN
+      value: meet.jitsi
+    - name: XMPP_AUTH_DOMAIN
+      value: auth.meet.jitsi
+    - name: XMPP_INTERNAL_MUC_DOMAIN
+      value: internal-muc.meet.jitsi
+    - name: JICOFO_COMPONENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: jitsi-config
+          key: JICOFO_COMPONENT_SECRET
+    - name: JICOFO_AUTH_USER
+      value: focus
+    - name: JICOFO_AUTH_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: jitsi-config
+          key: JICOFO_AUTH_PASSWORD
+    - name: TZ
+      value: America/Los_Angeles
+    - name: JVB_BREWERY_MUC
+      value: jvbbrewery
+
+prosody:
+  env:
+    - name: ENABLE_AUTH
+      value: "0"
+    - name: ENABLE_GUESTS
+      value: "0"
+    - name: AUTH_TYPE
+      value: internal
+    - name: XMPP_GUEST_DOMAIN
+      value: guest.jitsi.meet.jitsi
+    - name: XMPP_DOMAIN
+      value: meet.jitsi
+    - name: XMPP_AUTH_DOMAIN
+      value: auth.meet.jitsi
+    - name: XMPP_MUC_DOMAIN
+      value: muc.meet.jitsi
+    - name: XMPP_INTERNAL_MUC_DOMAIN
+      value: internal-muc.meet.jitsi
+    - name: JICOFO_COMPONENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: jitsi-config
+          key: JICOFO_COMPONENT_SECRET
+    - name: JVB_AUTH_USER
+      value: jvb
+    - name: JVB_AUTH_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: jitsi-config
+          key: JVB_AUTH_PASSWORD
+    - name: JICOFO_AUTH_USER
+      value: focus
+    - name: JICOFO_AUTH_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: jitsi-config
+          key: JICOFO_AUTH_PASSWORD
+    - name: TZ
+      value: America/Los_Angeles
+    - name: JVB_TCP_HARVESTER_DISABLED
+      value: "true"
+
+web:
+  env:
+    - name: ENABLE_AUTH
+      value: "0"
+    - name: ENABLE_GUESTS
+      value: "0"
+    - name: AUTH_TYPE
+      value: internal
+    - name: XMPP_GUEST_DOMAIN
+      value: guest.jitsi.meet.jitsi
+    - name: XMPP_SERVER
+      value: localhost
+    - name: JICOFO_AUTH_USER
+      value: focus
+    - name: XMPP_DOMAIN
+      value: meet.jitsi
+    - name: XMPP_AUTH_DOMAIN
+      value: auth.meet.jitsi
+    - name: XMPP_INTERNAL_MUC_DOMAIN
+      value: internal-muc.meet.jitsi
+    - name: XMPP_BOSH_URL_BASE
+      value: http://127.0.0.1:5280
+    - name: XMPP_MUC_DOMAIN
+      value: muc.meet.jitsi
+    - name: TZ
+      value: America/Los_Angeles
+    - name: JVB_TCP_HARVESTER_DISABLED
+      value: "true"
+
+jvb:
+  env:
+    - name: ENABLE_AUTH
+      value: "0"
+    - name: ENABLE_GUESTS
+      value: "0"
+    - name: AUTH_TYPE
+      value: internal
+    - name: XMPP_GUEST_DOMAIN
+      value: guest.jitsi.meet.jitsi
+    - name: XMPP_SERVER
+      value: localhost
+    - name: DOCKER_HOST_ADDRESS
+      value: 0.0.0.0/0
+    - name: XMPP_DOMAIN
+      value: meet.jitsi
+    - name: XMPP_AUTH_DOMAIN
+      value: auth.meet.jitsi
+    - name: XMPP_INTERNAL_MUC_DOMAIN
+      value: internal-muc.meet.jitsi
+    - name: JVB_STUN_SERVERS
+      value: stun.l.google.com:19302,stun1.l.google.com:19302,stun2.l.google.com:19302
+    - name: JICOFO_AUTH_USER
+      value: focus
+    - name: JVB_TCP_HARVESTER_DISABLED
+      value: "true"
+    - name: JVB_AUTH_USER
+      value: jvb
+    - name: JVB_PORT
+      value: "30300"
+    - name: JVB_AUTH_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: jitsi-config
+          key: JVB_AUTH_PASSWORD
+    - name: JICOFO_AUTH_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: jitsi-config
+          key: JICOFO_AUTH_PASSWORD
+    - name: JVB_BREWERY_MUC
+      value: jvbbrewery
+    - name: TZ
+      value: America/Los_Angeles
