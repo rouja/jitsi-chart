@@ -20,7 +20,7 @@ Adapt the content of  **customized-values.yaml** to your environment.
 At least you need to generate the secret
 
 ```console
-./generate-secret.sh 
+./jitsi-chart/generate-secret.sh
 ################################################
 JICOFO_AUTH_PASSWORD: bGlTY21na1FTRHlXRHpiWgo=
 JICOFO_COMPONENT_SECRET: VEE0bE03Q0xQeTlzNmlKWAo=
@@ -80,6 +80,13 @@ service:
   publicIp: "$YOUR_PUBLIC_IP"
 ```
 
+Do not forget to change the domain in all variables. For instance :
+
+```console
+    - name: XMPP_GUEST_DOMAIN
+      value: guest.jitsi.meet.jitsi
+```
+
 ### Deployment
 
 ```console
@@ -94,3 +101,12 @@ kubectl -n jitsi logs $(kubectl -n jitsi get po -o go-template --template="{{ ra
 ```
 
 If you see **[services.d] starting services** everything should be ok.
+
+### Authentication
+
+If you choose to enable authentication in order to generate a user, you can do :
+
+```console
+kubectl -n jitsi exec -it $(kubectl -n jitsi get po -o go-template --template="{{ range .items}}{{ .metadata.name }}{{end}}") -c jitsi-chart-prosody /bin/bash
+prosodyctl --config /config/prosody.cfg.lua register USER DOMAIN PASSWORD
+```
